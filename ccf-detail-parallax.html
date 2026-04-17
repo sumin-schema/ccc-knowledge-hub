@@ -27,9 +27,9 @@
 
   /* HERO */
   .hero { height: 100vh; background: #111; position: relative; display: flex; align-items: flex-end; overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; background: linear-gradient(160deg, #1e1e1e 0%, #0a0a0a 100%); will-change: transform; }
-  .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.88) 100%); }
-  .hero-content { position: relative; z-index: 2; padding: 0 80px 64px; display: grid; grid-template-columns: 1fr 300px; gap: 80px; width: 100%; align-items: end; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.88) 100%); z-index: 2; }
+  .hero-content { position: relative; z-index: 3; padding: 0 80px 64px; width: 100%; }
   .hero-tags { display: flex; gap: 8px; margin-bottom: 18px; }
   .hero-domain { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 2px; padding: 4px 10px; }
   .hero-status { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; background: rgba(24,95,165,0.4); border: 1px solid rgba(24,95,165,0.5); color: #8ec8f6; }
@@ -43,29 +43,23 @@
 
   /* ARTICLE */
   .article { max-width: 860px; margin: 0 auto; padding: 80px 40px 0; }
-
-  /* Reveal animations */
   .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.75s ease, transform 0.75s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
-  /* Typography */
   .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; margin-bottom: 12px; }
   .section-title { font-family: 'Libre Baskerville', serif; font-size: 24px; font-weight: 400; color: #1a1a1a; margin-bottom: 16px; line-height: 1.3; }
   .prose { font-size: 16px; color: #444; line-height: 1.85; }
   .section-gap { height: 72px; }
   .section-divider { height: 1px; background: #f0ede8; margin-bottom: 72px; }
 
-  /* Facts strip */
   .facts-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e8e5e0; border: 1px solid #e8e5e0; margin-bottom: 72px; }
   .fact-cell { background: #faf9f7; padding: 18px 24px; }
   .fact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 5px; }
   .fact-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
 
-  /* Callout */
   .callout { border-left: 3px solid #1a1a1a; padding: 18px 24px; margin: 36px 0; background: #faf9f7; }
   .callout-text { font-family: 'Libre Baskerville', serif; font-size: 18px; font-style: italic; color: #333; line-height: 1.65; }
 
-  /* VIZ BLOCKS */
   .viz-block { margin: 36px 0; border: 1px solid #e8e5e0; border-radius: 4px; overflow: hidden; }
   .viz-header { padding: 14px 20px; border-bottom: 1px solid #e8e5e0; background: #faf9f7; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .viz-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
@@ -73,7 +67,6 @@
   .viz-body { padding: 24px; }
   .viz-note { font-size: 11px; color: #bbb; margin-top: 14px; font-style: italic; }
 
-  /* 1. Pipeline */
   .pipeline { display: flex; align-items: flex-start; padding: 8px 0 4px; }
   .pipe-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
   .pipe-connector { position: absolute; top: 9px; left: 50%; right: -50%; height: 2px; background: #e8e5e0; z-index: 0; }
@@ -87,14 +80,12 @@
   .pipe-step.active .pipe-label { color: #1a1a1a; font-weight: 600; }
   .pipe-you { font-size: 10px; color: #378ADD; font-weight: 600; margin-top: 4px; }
 
-  /* 2. AI types */
   .ai-types { display: flex; flex-wrap: wrap; gap: 8px; }
   .ai-tile { border-radius: 3px; padding: 10px 16px; font-size: 13px; font-weight: 600; }
   .ai-tile.primary { background: #1a1a1a; color: #fff; }
   .ai-tile.secondary { background: #f0ede8; color: #555; font-size: 12px; }
   .ai-tile.tertiary { background: #f5f2ee; color: #888; font-size: 11px; }
 
-  /* 3. Bar chart */
   .bar-chart { display: flex; flex-direction: column; gap: 10px; }
   .bar-row { display: flex; align-items: center; gap: 14px; }
   .bar-label { font-size: 13px; color: #555; width: 160px; flex-shrink: 0; text-align: right; }
@@ -105,7 +96,6 @@
   .bar-row.this .bar-label { color: #1a1a1a; font-weight: 600; }
   .bar-row.this .bar-value { color: #1a1a1a; font-weight: 600; }
 
-  /* 4. Gov flow */
   .gov-flow { display: flex; border: 1px solid #e8e5e0; border-radius: 3px; overflow: hidden; }
   .gov-step { flex: 1; padding: 16px 10px; border-right: 1px solid #e8e5e0; text-align: center; }
   .gov-step:last-child { border-right: none; }
@@ -114,7 +104,6 @@
   .gov-label { font-size: 12px; color: #888; line-height: 1.4; }
   .gov-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #378ADD; margin-top: 5px; }
 
-  /* 5. Heatmap */
   .heatmap { display: grid; grid-template-columns: 160px repeat(3, 1fr); gap: 4px; }
   .hm-head { font-size: 10px; font-weight: 600; text-transform: uppercase; color: #bbb; text-align: center; padding: 6px 0; }
   .hm-label { font-size: 12px; color: #555; display: flex; align-items: center; padding: 4px 0; font-weight: 600; }
@@ -126,12 +115,12 @@
   .hm-cell.c3 { background: #1a1a1a; color: #fff; }
   .hm-you { position: absolute; top: -7px; right: -4px; font-size: 9px; background: #378ADD; color: #fff; border-radius: 2px; padding: 1px 4px; font-weight: 600; }
 
-  /* Related */
   .related { padding: 72px 80px 80px; border-top: 1px solid #e8e5e0; }
   .related-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
   .related-hd { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 400; color: #1a1a1a; margin-bottom: 28px; }
   .rel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e5e0; border: 1px solid #e8e5e0; }
-  .rel-card { background: #fff; padding: 24px 28px 28px; }
+  .rel-card { background: #fff; padding: 24px 28px 28px; cursor: pointer; transition: background 0.1s; }
+  .rel-card:hover { background: #faf9f7; }
   .rc-domain { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #ccc; margin-bottom: 10px; }
   .rc-title { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 400; color: #1a1a1a; margin: 10px 0 6px; line-height: 1.3; }
   .rc-meta { font-size: 12px; color: #bbb; margin-bottom: 8px; }
@@ -140,7 +129,6 @@
   .tp { background: #E6F1FB; color: #185FA5; }
   .tpl { background: #EAF3DE; color: #3B6D11; }
 
-  /* Footer */
   .footer { background: #faf9f7; border-top: 1px solid #e8e5e0; padding: 48px 80px; display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr; gap: 48px; }
   .f-org { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 10px; }
   .f-sub { font-size: 12px; color: #bbb; line-height: 1.6; }
@@ -149,17 +137,15 @@
   .f-links li { font-size: 13px; color: #aaa; }
 </style>
 </head>
-<body><script>
+<body>
+
+<script>
 (function() {
-  var stored = sessionStorage.getItem('ccf_auth');
-  if (stored === 'ok') return;
-  var user = prompt('Username:');
-  var pass = prompt('Password:');
-  if (user === 'ccf' && pass === '2026') {
-    sessionStorage.setItem('ccf_auth', 'ok');
-  } else {
-    document.body.innerHTML = '<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>';
-  }
+  var s = sessionStorage.getItem('ccf_auth');
+  if (s === 'ok') return;
+  var u = prompt('Username:'), p = prompt('Password:');
+  if (u === 'ccf' && p === '2026') { sessionStorage.setItem('ccf_auth','ok'); }
+  else { document.body.innerHTML='<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>'; }
 })();
 </script>
 
@@ -180,24 +166,17 @@
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- HERO with flowing lines animation -->
 <div class="hero">
-  <div class="hero-bg" id="hero-bg"></div>
+  <canvas id="hero-canvas"></canvas>
   <div class="hero-gradient"></div>
   <div class="hero-content">
-    <div>
-      <div class="hero-tags">
-        <span class="hero-domain">Benefits Delivery</span>
-        <span class="hero-status">Piloting</span>
-      </div>
-      <div class="hero-title">Benefits Eligibility Screening</div>
-      <div class="hero-lede">Colorado is using AI to help caseworkers process SNAP and Medicaid applications faster — without removing humans from the decision.</div>
+    <div class="hero-tags">
+      <span class="hero-domain">Benefits Delivery</span>
+      <span class="hero-status">Piloting</span>
     </div>
-    <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">35%</div><div class="hero-stat-label">Faster processing time for standard applications</div></div>
-      <div class="hero-stat"><div class="hero-stat-num">2,000</div><div class="hero-stat-label">Applications reviewed per week in pilot counties</div></div>
-      <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">False negatives on pilot sample</div></div>
-    </div>
+    <div class="hero-title">Benefits Eligibility Screening</div>
+    <div class="hero-lede">Colorado is using AI to help caseworkers process SNAP and Medicaid applications faster — without removing humans from the decision.</div>
   </div>
 </div>
 
@@ -211,7 +190,6 @@
     <div class="fact-cell"><div class="fact-label">Last updated</div><div class="fact-value">March 2026</div></div>
   </div>
 
-  <!-- The problem -->
   <div class="reveal">
     <div class="eyebrow">The problem</div>
     <div class="section-title">Caseworkers were spending too much time on paperwork, not people</div>
@@ -220,14 +198,12 @@
 
   <div class="section-gap"></div>
 
-  <!-- The approach -->
   <div class="reveal">
     <div class="eyebrow">The approach</div>
     <div class="section-title">AI handles the initial read. Humans make every final call.</div>
     <div class="prose">The pilot uses a fine-tuned language model to review submitted application documents, extract key eligibility data points, and flag cases that need closer review. The system runs alongside existing caseworker workflows — it does not replace them.</div>
   </div>
 
-  <!-- VIZ 1: Stage pipeline -->
   <div class="viz-block reveal">
     <div class="viz-header">
       <span class="viz-title">Where this pilot sits in the deployment lifecycle</span>
@@ -246,7 +222,6 @@
     </div>
   </div>
 
-  <!-- VIZ 2: AI types -->
   <div class="viz-block reveal">
     <div class="viz-header">
       <span class="viz-title">AI application types used in this pilot</span>
@@ -259,7 +234,7 @@
         <div class="ai-tile secondary">Data classification</div>
         <div class="ai-tile tertiary">Intelligent search</div>
       </div>
-      <div class="viz-note">Darker tiles are the primary AI types used in this pilot. Tile weight reflects frequency across all pilots in the database.</div>
+      <div class="viz-note">Darker tiles are the primary AI types used in this pilot.</div>
     </div>
   </div>
 
@@ -270,38 +245,24 @@
   <div class="section-gap"></div>
   <div class="section-divider"></div>
 
-  <!-- Outcomes -->
   <div class="reveal">
     <div class="eyebrow">Outcomes so far</div>
     <div class="section-title">Early results are strong — and unusually well documented</div>
-    <div class="prose">Processing time for standard applications dropped by 35%. Caseworkers report spending more time on complex cases that require nuanced judgment. The system processes approximately 2,000 applications per week across the three pilot counties.</div>
+    <div class="prose">Processing time for standard applications dropped by 35%. Caseworkers report spending more time on complex cases that require nuanced judgment.</div>
   </div>
 
-  <!-- VIZ 3: Peer bar chart -->
   <div class="viz-block reveal" id="viz-bars">
     <div class="viz-header">
       <span class="viz-title">Processing time improvement — Benefits Delivery pilots compared</span>
-      <span class="viz-subtitle">Based on survey field: Measurable outcomes — illustrative data</span>
+      <span class="viz-subtitle">Illustrative placeholder data</span>
     </div>
     <div class="viz-body">
       <div class="bar-chart">
-        <div class="bar-row this">
-          <div class="bar-label">Colorado ★</div>
-          <div class="bar-track"><div class="bar-fill this" id="bar-co" style="width:0%"></div></div>
-          <div class="bar-value">35%</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Oregon</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-or" style="width:0%"></div></div>
-          <div class="bar-value">28%</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Texas (planned)</div>
-          <div class="bar-track"><div class="bar-fill" id="bar-tx" style="width:0%;background:#e8e5e0;"></div></div>
-          <div class="bar-value">—</div>
-        </div>
+        <div class="bar-row this"><div class="bar-label">Colorado ★</div><div class="bar-track"><div class="bar-fill this" id="bar-co" style="width:0%"></div></div><div class="bar-value">35%</div></div>
+        <div class="bar-row"><div class="bar-label">Oregon</div><div class="bar-track"><div class="bar-fill" id="bar-or" style="width:0%"></div></div><div class="bar-value">28%</div></div>
+        <div class="bar-row"><div class="bar-label">Texas (planned)</div><div class="bar-track"><div class="bar-fill" id="bar-tx" style="width:0%;background:#e8e5e0;"></div></div><div class="bar-value">—</div></div>
       </div>
-      <div class="viz-note">★ This pilot &nbsp;·&nbsp; Reduction in processing time for standard applications &nbsp;·&nbsp; Illustrative placeholder data</div>
+      <div class="viz-note">★ This pilot · Reduction in processing time · Illustrative data</div>
     </div>
   </div>
 
@@ -312,14 +273,12 @@
   <div class="section-gap"></div>
   <div class="section-divider"></div>
 
-  <!-- Governance -->
   <div class="reveal">
     <div class="eyebrow">Governance</div>
     <div class="section-title">Every determination is logged, reviewed, and auditable</div>
     <div class="prose">The pilot operates under the state's AI governance framework with monthly review cycles. An oversight committee — including agency leadership, IT, legal counsel, and community advocates — reviews system performance on an ongoing basis.</div>
   </div>
 
-  <!-- VIZ 4: Governance flow -->
   <div class="viz-block reveal">
     <div class="viz-header">
       <span class="viz-title">Decision flow — who does what</span>
@@ -333,15 +292,14 @@
         <div class="gov-step human"><div class="gov-num">4</div><div class="gov-label">Human makes final determination</div><div class="gov-badge">Human only</div></div>
         <div class="gov-step"><div class="gov-num">5</div><div class="gov-label">Decision logged &amp; auditable</div></div>
       </div>
-      <div class="viz-note">Steps 3 and 4 are human-only. AI output cannot trigger a determination without caseworker review.</div>
+      <div class="viz-note">Steps 3 and 4 are human-only — AI output cannot trigger a determination without caseworker review.</div>
     </div>
   </div>
 
-  <!-- VIZ 5: Domain heatmap -->
   <div class="viz-block reveal">
     <div class="viz-header">
       <span class="viz-title">Where Benefits Delivery sits across the full landscape</span>
-      <span class="viz-subtitle">Based on survey fields: Domain + Deployment stage — illustrative data</span>
+      <span class="viz-subtitle">Domain + Deployment stage — illustrative data</span>
     </div>
     <div class="viz-body">
       <div class="heatmap">
@@ -349,27 +307,22 @@
         <div class="hm-head">Planning</div>
         <div class="hm-head">Piloting</div>
         <div class="hm-head">Scaling</div>
-
         <div class="hm-label">Benefits Delivery</div>
         <div class="hm-cell c1">1</div>
         <div class="hm-cell c3" style="position:relative;">2<span class="hm-you">You</span></div>
         <div class="hm-cell c0">0</div>
-
         <div class="hm-label dim">Workforce</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c2">1</div>
-
         <div class="hm-label dim">Permitting</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c1">1</div>
         <div class="hm-cell c0">0</div>
-
         <div class="hm-label dim">Fraud Detection</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c2">1</div>
-
         <div class="hm-label dim">Internal Ops</div>
         <div class="hm-cell c0">0</div>
         <div class="hm-cell c1">1</div>
@@ -383,7 +336,6 @@
 
 </div>
 
-<!-- RELATED -->
 <div class="related reveal">
   <div class="related-eyebrow">Others solving similar problems</div>
   <div class="related-hd">Related pilots</div>
@@ -402,20 +354,98 @@
 </div>
 
 <script>
-// Progress bar
+// ── ORGANIC WAVE LINES ANIMATION ────────────────────────
+const canvas = document.getElementById('hero-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, t = 0, lines = [];
+const LINE_COUNT = 12;
+const POINTS = 8;
+
+function resizeCanvas() {
+  W = canvas.offsetWidth; H = canvas.offsetHeight;
+  canvas.width = W; canvas.height = H;
+  lines = [];
+  const midY = H * 0.42;
+  const spread = H * 0.22;
+  for (let i = 0; i < LINE_COUNT; i++) {
+    const isBlue = i === 4 || i === 9;
+    const baseY = midY + (Math.random() - 0.5) * spread * 2;
+    const pts = [];
+    for (let p = 0; p < POINTS; p++) {
+      pts.push({
+        offset: (Math.random() - 0.5) * 20,
+        speed: 0.0015 + Math.random() * 0.003,
+        phase: Math.random() * Math.PI * 2,
+        range: 30 + Math.random() * 70,
+      });
+    }
+    lines.push({
+      baseY, pts,
+      opBase:  0.04 + Math.random() * 0.06,
+      opPeak:  i % 3 === 0 ? 0.45 + Math.random() * 0.2 : 0.15 + Math.random() * 0.2,
+      opSpeed: 0.0008 + Math.random() * 0.002,
+      opPhase: Math.random() * Math.PI * 2,
+      wBase:   0.5 + Math.random() * 0.4,
+      wPeak:   i % 3 === 0 ? 2.0 + Math.random() * 0.8 : 1.0 + Math.random() * 0.6,
+      color: isBlue ? '55,138,221' : '255,255,255',
+    });
+  }
+  lines.sort((a, b) => a.opPeak - b.opPeak);
+}
+
+function spline(ctx, pts) {
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(i-1,0)];
+    const p1 = pts[i];
+    const p2 = pts[i+1];
+    const p3 = pts[Math.min(i+2, pts.length-1)];
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  t++;
+  lines.forEach(l => {
+    const pulse = (Math.sin(t * l.opSpeed + l.opPhase) + 1) / 2;
+    const alpha = l.opBase + pulse * (l.opPeak - l.opBase);
+    const lw = l.wBase + pulse * (l.wPeak - l.wBase);
+    const pts = l.pts.map((p, i) => ({
+      x: (i / (POINTS - 1)) * W,
+      y: l.baseY + p.offset + Math.sin(t * p.speed + p.phase) * p.range,
+    }));
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0,    `rgba(${l.color},0)`);
+    grad.addColorStop(0.06, `rgba(${l.color},${alpha})`);
+    grad.addColorStop(0.94, `rgba(${l.color},${alpha})`);
+    grad.addColorStop(1,    `rgba(${l.color},0)`);
+    ctx.beginPath();
+    spline(ctx, pts);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = lw;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  });
+  requestAnimationFrame(animate);
+}
+
+resizeCanvas();
+animate();
+window.addEventListener('resize', resizeCanvas);
+
+// ── PROGRESS BAR ────────────────────────────────────────
 window.addEventListener('scroll', () => {
   const scrolled = window.scrollY;
   const total = document.body.scrollHeight - window.innerHeight;
   document.getElementById('progress').style.width = (scrolled / total * 100) + '%';
 });
 
-// Parallax hero
-window.addEventListener('scroll', () => {
-  const y = window.scrollY;
-  document.getElementById('hero-bg').style.transform = 'translateY(' + (y * 0.4) + 'px)';
-});
-
-// Scroll reveal
+// ── SCROLL REVEALS ───────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -427,7 +457,6 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
 
-// Bar animation
 let barsAnimated = false;
 function animateBars() {
   if (barsAnimated) return;
