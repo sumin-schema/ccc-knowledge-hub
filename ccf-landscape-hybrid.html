@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCF — Pilot Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+  body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; }
+
+  .nav { border-bottom: 1px solid #2e2e2e; background: #1a1a1a; position: sticky; top: 0; z-index: 100; }
+  .nav-inner { padding: 0 80px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; }
+  .nav-ccf { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; margin-right: 6px; }
+  .nav-name { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; }
+  .nav-div { width: 1px; height: 16px; background: rgba(255,255,255,0.12); margin: 0 24px; }
+  .nav-sec { font-size: 13px; color: rgba(255,255,255,0.35); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; cursor: pointer; }
+  .nav-links a.active { color: #fff; font-weight: 600; }
+
+  .bc { border-bottom: 1px solid #e8e5e0; }
+  .bc-inner { padding: 0 80px; height: 40px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #aaa; }
+  .bc-cur { color: #1a1a1a; font-weight: 600; }
+
+  .page-header { padding: 40px 80px 32px; border-bottom: 1px solid #e8e5e0; }
+  .page-title { font-family: 'Libre Baskerville', serif; font-size: 34px; font-weight: 400; color: #1a1a1a; margin-bottom: 8px; }
+  .page-sub { font-size: 14px; color: #999; }
+
+  /* FILTERS */
+  .filters { padding: 16px 80px; border-bottom: 1px solid #e8e5e0; display: flex; gap: 10px; align-items: center; position: sticky; top: 60px; z-index: 90; background: #fff; }
+  .search-input { height: 36px; border: 1px solid #ddd; border-radius: 3px; padding: 0 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #1a1a1a; width: 240px; outline: none; }
+  .search-input::placeholder { color: #bbb; }
+  .search-input:focus { border-color: #aaa; }
+  .filter-select { height: 36px; border: 1px solid #ddd; border-radius: 3px; padding: 0 28px 0 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #555; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23bbb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 8px center; appearance: none; cursor: pointer; }
+
+  /* TABLE */
+  .table-wrap { padding: 0 80px 64px; }
+  .tbl-head { display: grid; grid-template-columns: 140px 1fr 150px 200px 120px; gap: 20px; padding: 14px 20px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #ccc; border-bottom: 1px solid #e8e5e0; position: sticky; top: 128px; z-index: 80; background: #fff; }
+  .tbl-row { display: grid; grid-template-columns: 140px 1fr 150px 200px 120px; gap: 20px; align-items: start; padding: 20px; border-bottom: 1px solid #f0ede8; cursor: pointer; transition: background 0.1s; text-decoration: none; color: inherit; display: grid; }
+  .tbl-row:hover { background: #faf9f7; }
+  .tr-domain { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #ccc; padding-top: 3px; line-height: 1.4; }
+  .tr-title { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 400; color: #1a1a1a; margin-bottom: 4px; line-height: 1.35; }
+  .tr-agency { font-size: 12px; color: #aaa; margin-bottom: 5px; }
+  .tr-excerpt { font-size: 12px; color: #ccc; line-height: 1.55; }
+  .tr-state { font-size: 13px; color: #555; font-weight: 600; padding-top: 3px; }
+  .tr-uc { font-size: 12px; color: #888; padding-top: 3px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 9px; border-radius: 2px; }
+  .tp { background: #E6F1FB; color: #185FA5; }
+  .tpl { background: #EAF3DE; color: #3B6D11; }
+  .ts { background: #FAEEDA; color: #854F0B; }
+  .no-results { padding: 48px 20px; text-align: center; font-size: 14px; color: #bbb; }
+
+  /* PAGINATION */
+  .pagination { padding: 20px 80px 48px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e8e5e0; }
+  .pg-info { font-size: 13px; color: #aaa; }
+  .pg-controls { display: flex; gap: 4px; }
+  .pg-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid #e8e5e0; border-radius: 3px; font-size: 13px; color: #888; cursor: pointer; user-select: none; transition: all 0.1s; text-decoration: none; }
+  .pg-btn:hover { background: #faf9f7; }
+  .pg-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-weight: 600; }
+  .pg-ellipsis { width: 34px; text-align: center; font-size: 13px; color: #ccc; line-height: 34px; }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid #e8e5e0; padding: 48px 80px; background: #faf9f7; }
+  .footer-inner { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr; gap: 48px; }
+  .f-org { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 10px; }
+  .f-sub { font-size: 12px; color: #bbb; line-height: 1.6; }
+  .f-head { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin-bottom: 14px; }
+  .f-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .f-links li { font-size: 13px; color: #aaa; }
+</style>
+</head>
+<body>
+
+<script>
+(function() {
+  var stored = sessionStorage.getItem('ccf_auth');
+  if (stored === 'ok') return;
+  var user = prompt('Username:');
+  var pass = prompt('Password:');
+  if (user === 'ccf' && pass === '2026') {
+    sessionStorage.setItem('ccf_auth', 'ok');
+  } else {
+    document.body.innerHTML = '<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>';
+  }
+})();
+</script>
+
+<nav class="nav"><div class="nav-inner">
+  <div class="nav-left">
+    <span class="nav-ccf">CCF</span>
+    <span class="nav-name">Center for Civic Futures</span>
+    <div class="nav-div"></div>
+    <span class="nav-sec">AI &amp; Emerging Tech for Government</span>
+  </div>
+  <div class="nav-links">
+    <a>AI Knowledge Hub</a>
+    <a class="active">Pilots</a>
+    <a>Resources</a>
+    <a>About</a>
+  </div>
+</div></nav>
+
+<div class="bc"><div class="bc-inner">
+  <span>AI Knowledge Hub</span><span style="color:#ddd">/</span>
+  <span class="bc-cur">Pilot Landscape</span>
+</div></div>
+
+<div class="page-header">
+  <div class="page-title">Pilot Landscape</div>
+  <div class="page-sub">Explore how states are deploying AI across public-sector domains</div>
+</div>
+
+<div class="filters">
+  <input class="search-input" id="search" placeholder="Search pilots..." oninput="applyFilters()" />
+  <select class="filter-select" id="filter-domain" onchange="applyFilters()">
+    <option value="">All domains</option>
+    <option>Benefits Delivery</option>
+    <option>Permitting</option>
+    <option>Workforce</option>
+    <option>Licensing</option>
+    <option>Internal Ops</option>
+    <option>Legacy Systems</option>
+    <option>Fraud Detection</option>
+  </select>
+  <select class="filter-select" id="filter-state" onchange="applyFilters()">
+    <option value="">All states</option>
+    <option>California</option>
+    <option>Colorado</option>
+    <option>Indiana</option>
+    <option>Michigan</option>
+    <option>New Jersey</option>
+    <option>Oregon</option>
+    <option>Texas</option>
+    <option>Utah</option>
+  </select>
+  <select class="filter-select" id="filter-status" onchange="applyFilters()">
+    <option value="">All statuses</option>
+    <option>Planning</option>
+    <option>Piloting</option>
+    <option>Scaling</option>
+  </select>
+  <select class="filter-select" id="filter-usecase" onchange="applyFilters()">
+    <option value="">All use cases</option>
+    <option>Decision Support</option>
+    <option>Document Processing</option>
+    <option>Citizen Services</option>
+    <option>Internal Automation</option>
+    <option>Code Modernization</option>
+    <option>Fraud Prevention</option>
+  </select>
+</div>
+
+<div class="table-wrap">
+  <div class="tbl-head">
+    <div>Domain</div><div>Pilot</div><div>State</div><div>Use case</div><div>Status</div>
+  </div>
+  <div id="pilot-table"></div>
+</div>
+
+<div class="pagination">
+  <div class="pg-info" id="pg-info">Showing 1–8 of 8 pilots</div>
+  <div class="pg-controls">
+    <div class="pg-btn">‹</div>
+    <div class="pg-btn active">1</div>
+    <div class="pg-btn">›</div>
+  </div>
+  <div style="font-size:13px;color:#aaa;">Rows per page
+    <select style="margin-left:8px;height:34px;border:1px solid #e8e5e0;border-radius:3px;padding:0 8px;font-family:'DM Sans',sans-serif;font-size:13px;color:#555;">
+      <option>10</option><option>25</option><option>50</option>
+    </select>
+  </div>
+</div>
+
+<div class="footer"><div class="footer-inner">
+  <div><div class="f-org">Center for Civic Futures</div><div class="f-sub">A non-partisan, non-profit project<br>of Digital Harbor Foundation</div></div>
+  <div><div class="f-head">Programs</div><ul class="f-links"><li>AI Readiness Project</li><li>AI Knowledge Hub</li><li>Chief AI Officer Network</li></ul></div>
+  <div><div class="f-head">Resources</div><ul class="f-links"><li>Research &amp; Publications</li><li>Events</li><li>News</li></ul></div>
+  <div><div class="f-head">Connect</div><ul class="f-links"><li>Contact us</li><li>LinkedIn</li><li>Newsletter</li></ul></div>
+</div></div>
+
+<script>
+const PILOTS = [
+  { domain: "Benefits Delivery", title: "Benefits Eligibility Screening", agency: "Colorado · Dept. of Human Services", excerpt: "AI-assisted eligibility pre-screening for SNAP and Medicaid applications.", state: "Colorado", useCase: "Decision Support", status: "Piloting", tag: "tp" },
+  { domain: "Permitting", title: "Permit Review Automation", agency: "Utah · Dept. of Commerce", excerpt: "ML-based review of commercial building permit applications.", state: "Utah", useCase: "Document Processing", status: "Piloting", tag: "tp" },
+  { domain: "Workforce", title: "Workforce Development Chatbot", agency: "Indiana · Dept. of Workforce Development", excerpt: "Conversational AI for job seeker assistance and training guidance.", state: "Indiana", useCase: "Citizen Services", status: "Scaling", tag: "ts" },
+  { domain: "Licensing", title: "License Renewal Processing", agency: "Michigan · Dept. of Licensing & Regulatory Affairs", excerpt: "Automated document verification for professional license renewals.", state: "Michigan", useCase: "Document Processing", status: "Planning", tag: "tpl" },
+  { domain: "Internal Ops", title: "IT Help Desk Agent", agency: "California · Dept. of Technology", excerpt: "AI agent handling tier-1 employee IT support requests.", state: "California", useCase: "Internal Automation", status: "Piloting", tag: "tp" },
+  { domain: "Legacy Systems", title: "Legacy Code Modernization", agency: "New Jersey · Office of Information Technology", excerpt: "LLM-assisted COBOL to modern language translation.", state: "New Jersey", useCase: "Code Modernization", status: "Piloting", tag: "tp" },
+  { domain: "Benefits Delivery", title: "Medicaid Redetermination AI", agency: "Oregon · Oregon Health Authority", excerpt: "AI-assisted review of Medicaid eligibility redeterminations.", state: "Oregon", useCase: "Decision Support", status: "Piloting", tag: "tp" },
+  { domain: "Fraud Detection", title: "Unemployment Fraud Detection", agency: "Texas · Texas Workforce Commission", excerpt: "Pattern recognition for identifying potentially fraudulent claims.", state: "Texas", useCase: "Fraud Prevention", status: "Scaling", tag: "ts" },
+];
+
+function renderTable(pilots) {
+  const tbl = document.getElementById('pilot-table');
+  if (pilots.length === 0) {
+    tbl.innerHTML = '<div class="no-results">No pilots match your filters.</div>';
+  } else {
+    tbl.innerHTML = pilots.map(p => `
+      <a class="tbl-row" href="ccf-detail-parallax.html">
+        <div class="tr-domain">${p.domain}</div>
+        <div>
+          <div class="tr-title">${p.title}</div>
+          <div class="tr-agency">${p.agency}</div>
+          <div class="tr-excerpt">${p.excerpt}</div>
+        </div>
+        <div class="tr-state">${p.state}</div>
+        <div class="tr-uc">${p.useCase}</div>
+        <div><span class="tag ${p.tag}">${p.status}</span></div>
+      </a>
+    `).join('');
+  }
+  document.getElementById('pg-info').textContent = `Showing 1–${Math.min(10, pilots.length)} of ${pilots.length} pilots`;
+}
+
+function applyFilters() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const domain = document.getElementById('filter-domain').value;
+  const state = document.getElementById('filter-state').value;
+  const status = document.getElementById('filter-status').value;
+  const usecase = document.getElementById('filter-usecase').value;
+
+  const filtered = PILOTS.filter(p => {
+    if (domain && p.domain !== domain) return false;
+    if (state && p.state !== state) return false;
+    if (status && p.status !== status) return false;
+    if (usecase && p.useCase !== usecase) return false;
+    if (search && !p.title.toLowerCase().includes(search) && !p.agency.toLowerCase().includes(search) && !p.excerpt.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  renderTable(filtered);
+}
+
+renderTable(PILOTS);
+</script>
+</body>
+</html>
