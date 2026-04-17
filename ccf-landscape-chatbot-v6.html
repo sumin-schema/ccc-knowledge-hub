@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCF — Pilot Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+  /* NAV */
+  .nav { border-bottom: 1px solid #2e2e2e; background: #1a1a1a; }
+  .nav-inner { max-width: 1440px; margin: 0 auto; padding: 0 80px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; }
+  .nav-ccf { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; margin-right: 4px; }
+  .nav-name { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; }
+  .nav-div { width: 1px; height: 16px; background: rgba(255,255,255,0.12); margin: 0 24px; }
+  .nav-sec { font-size: 13px; color: rgba(255,255,255,0.35); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; cursor: pointer; }
+  .nav-links a.active { color: #fff; font-weight: 600; }
+
+  /* WELCOME — full viewport, centered content */
+  .welcome-wrap {
+    height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 80px;
+  }
+
+  .welcome-inner {
+    width: 100%;
+    max-width: 640px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .welcome-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 34px;
+    font-weight: 400;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+  }
+
+  .welcome-sub {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .browse-link { font-size: 12px; color: #bbb; cursor: pointer; transition: color 0.12s; }
+  .browse-link:hover { color: #555; }
+
+  /* Input */
+  .input-unit { display: flex; gap: 8px; margin-bottom: 24px; }
+
+  .chat-input {
+    flex: 1; height: 52px;
+    background: #faf9f7; border: 1px solid #ddd;
+    border-radius: 3px; padding: 0 18px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: #1a1a1a; outline: none; transition: border-color 0.15s;
+  }
+  .chat-input::placeholder { color: #bbb; }
+  .chat-input:focus { border-color: #aaa; background: #fff; }
+
+  .chat-send {
+    height: 52px; padding: 0 24px;
+    background: #1a1a1a; color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    border: none; border-radius: 4px; cursor: pointer;
+    white-space: nowrap; transition: background 0.12s; flex-shrink: 0;
+  }
+  .chat-send:hover { background: #333; }
+
+  /* Prompt cards */
+  .prompts-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #bbb; margin-bottom: 14px;
+  }
+
+  .prompts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 24px; }
+
+  .prompt-card {
+    background: #faf9f7; border: 1px solid #e8e5e0;
+    border-radius: 3px; padding: 18px 18px;
+    min-height: 88px;
+    cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 10px;
+  }
+  .prompt-card:hover { background: #f0ede8; border-color: #d8d5d0; }
+
+  .prompt-body { flex: 1; }
+  .prompt-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #aaa; margin-bottom: 4px; }
+  .prompt-text { font-size: 13px; color: #555; line-height: 1.45; }
+  .prompt-card:hover .prompt-text { color: #1a1a1a; }
+  .prompt-arrow { font-size: 12px; color: #ccc; flex-shrink: 0; margin-top: 1px; transition: color 0.12s; }
+  .prompt-card:hover .prompt-arrow { color: #888; }
+
+  /* Domain chips */
+  .domain-strip { display: flex; flex-direction: column; gap: 10px; }
+  .domain-strip-label { font-size: 12px; color: #bbb; }
+  .domain-chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .domain-chip { font-size: 13px; color: #666; border: 1px solid #ddd; border-radius: 2px; padding: 8px 16px; cursor: pointer; transition: all 0.12s; background: #fff; }
+  .domain-chip:hover { color: #1a1a1a; border-color: #aaa; }
+
+  /* CONVERSATION */
+  .conversation-wrap { display: none; flex-direction: column; max-width: 960px; width: 100%; margin: 0 auto; padding: 48px 80px 160px; }
+
+  .messages { display: flex; flex-direction: column; }
+
+  .msg-user { display: flex; justify-content: flex-end; margin-bottom: 24px; }
+  .msg-user-bubble { background: #f0ede8; border: 1px solid #e8e5e0; border-radius: 12px 12px 2px 12px; padding: 10px 16px; font-size: 14px; color: #1a1a1a; max-width: 520px; line-height: 1.5; }
+
+  .msg-ai { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; max-width: 720px; }
+  .msg-ai-label { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #378ADD; }
+  .msg-ai-synthesis { font-size: 14px; color: #555; line-height: 1.85; }
+  .msg-ai-synthesis strong { color: #1a1a1a; font-weight: 600; }
+
+  .result-cards { border: 1px solid #e8e5e0; border-radius: 4px; overflow: hidden; }
+  .result-card { background: #fff; padding: 20px 24px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f0ede8; }
+  .result-card:last-child { border-bottom: none; }
+  .result-card:hover { background: #faf9f7; }
+  .rc-title { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 400; color: #1a1a1a; margin-bottom: 6px; }
+  .rc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .rc-domain { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #bbb; }
+  .rc-sep { color: #ddd; }
+  .rc-meta { font-size: 12px; color: #999; }
+  .rc-excerpt { font-size: 12px; color: #999; line-height: 1.5; }
+  .rc-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; white-space: nowrap; align-self: start; }
+  .tp  { background: #E6F1FB; color: #185FA5; }
+  .tpl { background: #EAF3DE; color: #3B6D11; }
+  .ts  { background: #FAEEDA; color: #854F0B; }
+
+  .result-footer { background: #faf9f7; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f0ede8; }
+  .result-count { font-size: 11px; color: #bbb; }
+  .result-browse { font-size: 12px; color: #378ADD; cursor: pointer; transition: color 0.12s; }
+  .result-browse:hover { color: #185FA5; }
+
+  .followups { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .followup-chip { font-size: 12px; color: #777; border: 1px solid #ddd; border-radius: 20px; padding: 6px 13px; cursor: pointer; transition: all 0.12s; background: #fff; }
+  .followup-chip:hover { color: #1a1a1a; border-color: #aaa; background: #faf9f7; }
+
+  .thread-sep { height: 1px; background: #f0ede8; margin: 4px 0 16px; }
+
+  /* Pinned input bar */
+  .conv-input-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #fff 68%, transparent); padding: 20px 0 28px; z-index: 10; display: none; }
+  .conv-input-bar.visible { display: block; }
+  .conv-input-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 8px; padding: 0 80px; }
+</style>
+</head>
+<body><script>
+(function() {
+  var stored = sessionStorage.getItem('ccf_auth');
+  if (stored === 'ok') return;
+  var user = prompt('Username:');
+  var pass = prompt('Password:');
+  if (user === 'ccf' && pass === '2026') {
+    sessionStorage.setItem('ccf_auth', 'ok');
+  } else {
+    document.body.innerHTML = '<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>';
+  }
+})();
+</script>
+
+  <nav class="nav"><div class="nav-inner">
+    <div class="nav-left">
+      <span class="nav-ccf">CCF</span>
+      <span class="nav-name">Center for Civic Futures</span>
+      <div class="nav-div"></div>
+      <div class="nav-sec">AI &amp; Emerging Tech for Government</div>
+    </div>
+    <div class="nav-links">
+      <a>AI Knowledge Hub</a>
+      <a class="active">Pilots</a>
+      <a>Resources</a>
+      <a>About</a>
+    </div>
+  </div></nav>
+
+  <!-- WELCOME — centered in viewport -->
+  <div class="welcome-wrap" id="welcome-wrap">
+    <div class="welcome-inner">
+
+      <div class="welcome-title">Pilot Landscape</div>
+      <div class="welcome-sub">
+        <span>Search a growing database of AI pilots across state and territory governments</span>
+        <span class="browse-link">Browse all</span>
+      </div>
+
+      <div class="input-unit">
+        <input class="chat-input" id="chat-input" placeholder="Search by domain, state, stage, or governance…" />
+        <button class="chat-send" onclick="handleSend()">Search</button>
+      </div>
+
+      <div class="prompts-label">Suggested searches</div>
+      <div class="prompts-grid">
+        <div class="prompt-card" onclick="sendQ('Which states are piloting AI in benefits delivery?')">
+          <div class="prompt-body"><div class="prompt-label">By domain</div><div class="prompt-text">Which states are piloting AI in benefits delivery?</div></div>
+          <div class="prompt-arrow"></div>
+        </div>
+        <div class="prompt-card" onclick="sendQ('What AI pilots are currently scaling?')">
+          <div class="prompt-body"><div class="prompt-label">By deployment stage</div><div class="prompt-text">What AI pilots are currently scaling?</div></div>
+          <div class="prompt-arrow"></div>
+        </div>
+        <div class="prompt-card" onclick="sendQ('Show me pilots with strong human-in-the-loop governance')">
+          <div class="prompt-body"><div class="prompt-label">By governance</div><div class="prompt-text">Show me pilots with strong human-in-the-loop governance</div></div>
+          <div class="prompt-arrow"></div>
+        </div>
+        <div class="prompt-card" onclick="sendQ('What is Indiana doing with workforce AI?')">
+          <div class="prompt-body"><div class="prompt-label">By state</div><div class="prompt-text">What is Indiana doing with workforce AI?</div></div>
+          <div class="prompt-arrow"></div>
+        </div>
+      </div>
+
+      <div class="domain-strip">
+        <span class="domain-strip-label">Or browse by domain</span>
+        <div class="domain-chips-row">
+          <div class="domain-chip" onclick="sendQ('Benefits delivery pilots')">Benefits delivery</div>
+          <div class="domain-chip" onclick="sendQ('Permitting pilots')">Permitting</div>
+          <div class="domain-chip" onclick="sendQ('Workforce AI pilots')">Workforce</div>
+          <div class="domain-chip" onclick="sendQ('Licensing pilots')">Licensing</div>
+          <div class="domain-chip" onclick="sendQ('Internal operations pilots')">Internal ops</div>
+</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONVERSATION -->
+  <div class="conversation-wrap" id="conv-wrap">
+    <div class="messages" id="messages"></div>
+  </div>
+
+  <div class="conv-input-bar" id="conv-input-bar">
+    <div class="conv-input-inner">
+      <input class="chat-input" id="conv-input" placeholder="Ask another question…" />
+      <button class="chat-send" onclick="handleConvSend()">Search</button>
+    </div>
+  </div>
+
+<script>
+const PILOTS = [
+  { domain: "Benefits Delivery", title: "Benefits Eligibility Screening", meta: "Colorado · Dept. of Human Services", excerpt: "AI-assisted pre-screening for SNAP and Medicaid. 35% reduction in processing time.", status: "Piloting", tag: "tp", keys: ["benefits","snap","medicaid","colorado","human-in-loop"] },
+  { domain: "Permitting", title: "Permit Review Automation", meta: "Utah · Dept. of Commerce", excerpt: "ML-based review of commercial building permit applications.", status: "Piloting", tag: "tp", keys: ["permit","building","utah"] },
+  { domain: "Workforce", title: "Workforce Development Chatbot", meta: "Indiana · Dept. of Workforce Development", excerpt: "Conversational AI for job seeker assistance. Scaling statewide.", status: "Scaling", tag: "ts", keys: ["workforce","labor","jobs","indiana","scaling"] },
+  { domain: "Licensing", title: "License Renewal Processing", meta: "Michigan · Dept. of Licensing & Regulatory Affairs", excerpt: "Automated document verification for professional license renewals.", status: "Planning", tag: "tpl", keys: ["license","michigan","governance","planning"] },
+  { domain: "Internal Ops", title: "IT Help Desk Agent", meta: "California · Dept. of Technology", excerpt: "AI agent handling tier-1 IT support. 68% of tickets resolved without human involvement.", status: "Piloting", tag: "tp", keys: ["internal","it","california","agentic"] },
+  { domain: "Legacy Systems", title: "Legacy Code Modernization", meta: "New Jersey · Office of Information Technology", excerpt: "LLM-assisted COBOL to modern language translation.", status: "Piloting", tag: "tp", keys: ["legacy","code","new jersey"] },
+  { domain: "Benefits Delivery", title: "Medicaid Redetermination AI", meta: "Oregon · Oregon Health Authority", excerpt: "AI-assisted review of Medicaid eligibility redeterminations.", status: "Piloting", tag: "tp", keys: ["benefits","medicaid","oregon","human-in-loop"] },
+  { domain: "Fraud Detection", title: "Unemployment Fraud Detection", meta: "Texas · Texas Workforce Commission", excerpt: "Pattern recognition for potentially fraudulent claims. $340M prevented in FY2025.", status: "Scaling", tag: "ts", keys: ["fraud","unemployment","texas","scaling"] },
+];
+
+const R = {
+  benefits:   { s: 'Both <strong>Benefits Delivery</strong> pilots — Colorado and Oregon — use AI for decision support with <strong>human-in-the-loop review</strong> before any final determination. Colorado reports a 35% reduction in processing time; Oregon processed 180,000 redeterminations in 90 days.', p: ["Benefits Eligibility Screening","Medicaid Redetermination AI"], f: ["How do Colorado and Oregon compare?","What governance frameworks are they using?","Are any benefits pilots in the planning stage?"] },
+  scaling:    { s: '<strong>Two pilots are currently scaling</strong> — Indiana\'s Workforce Chatbot and Texas\'s Fraud Detection system. Both demonstrated measurable outcomes before expanding: Indiana at 74% self-service resolution, Texas at $340M in fraud prevented.', p: ["Workforce Development Chatbot","Unemployment Fraud Detection"], f: ["What made Indiana\'s pilot successful?","Tell me more about Texas fraud detection","What pilots are close to scaling?"] },
+  governance: { s: 'The consistent pattern across governance-focused pilots is <strong>human review before any final determination</strong>. Michigan stands out for building bias auditing and explainability requirements into procurement criteria — before deployment began.', p: ["Benefits Eligibility Screening","Medicaid Redetermination AI","License Renewal Processing"], f: ["Which pilots have external audits?","What does Michigan\'s procurement look like?"] },
+  indiana:    { s: 'Indiana\'s <strong>Workforce Development Chatbot</strong> is now scaling statewide after a successful two-office pilot. 74% of users resolved queries without a caseworker. Hard topic blocks redirect sensitive questions to human staff automatically.', p: ["Workforce Development Chatbot"], f: ["What other workforce pilots exist?","Show me other scaling pilots"] },
+  texas:      { s: 'Texas\'s <strong>Unemployment Fraud Detection</strong> system is scaling after preventing $340M in fraudulent claims in FY2025. The system uses ensemble ML with human investigator review for all flags — no automated claim denials.', p: ["Unemployment Fraud Detection"], f: ["How does the fraud detection model work?","Show me other scaling pilots"] },
+  planning:   { s: 'One pilot is currently in the <strong>planning stage</strong> — Michigan\'s License Renewal Processing initiative, notable for building governance requirements into procurement criteria upfront.', p: ["License Renewal Processing"], f: ["What does Michigan\'s governance framework look like?","Show me piloting-stage pilots"] },
+};
+
+function match(q) {
+  const l = q.toLowerCase();
+  if (l.includes("benefit") || l.includes("snap") || l.includes("medicaid")) return "benefits";
+  if (l.includes("scal")) return "scaling";
+  if (l.includes("govern") || l.includes("oversight") || l.includes("human-in") || l.includes("loop")) return "governance";
+  if (l.includes("indiana") || (l.includes("workforce") && !l.includes("fraud"))) return "indiana";
+  if (l.includes("texas") || l.includes("fraud")) return "texas";
+  if (l.includes("plan")) return "planning";
+  return null;
+}
+
+function cards(titles) {
+  const ps = PILOTS.filter(p => titles.includes(p.title));
+  return `<div class="result-cards">
+    ${ps.map(p=>`<div class="result-card"><div><div class="rc-title">${p.title}</div><div class="rc-row"><span class="rc-domain">${p.domain}</span><span class="rc-sep">·</span><span class="rc-meta">${p.meta}</span></div><div class="rc-excerpt">${p.excerpt}</div></div><span class="rc-tag ${p.tag}">${p.status}</span></div>`).join('')}
+    <div class="result-footer"><span class="result-count">${ps.length} pilot${ps.length!==1?'s':''}</span><span class="result-browse">View in full landscape →</span></div>
+  </div>`;
+}
+
+let n = 0;
+
+function addMsg(html) {
+  document.getElementById('messages').insertAdjacentHTML('beforeend', html);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function enterConversation() {
+  document.getElementById('welcome-wrap').style.display = 'none';
+  const cw = document.getElementById('conv-wrap');
+  cw.style.display = 'flex';
+  cw.style.flexDirection = 'column';
+  document.getElementById('conv-input-bar').classList.add('visible');
+}
+
+function respond(q) {
+  const type = match(q);
+  setTimeout(() => {
+    if (type && R[type]) {
+      const r = R[type];
+      addMsg(`<div class="msg-ai">
+        <div class="msg-ai-label"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#378ADD" stroke-width="1"/><path d="M3.5 6l1.5 1.5 3-3" stroke="#378ADD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>AI synthesis</div>
+        <div class="msg-ai-synthesis">${r.s}</div>
+        ${cards(r.p)}
+        <div class="followups">${r.f.map(f=>`<div class="followup-chip" onclick="sendQ('${f.replace(/'/g,"\\'")}')">${f}</div>`).join('')}</div>
+      </div>`);
+    } else {
+      const hits = PILOTS.filter(p=>{const l=q.toLowerCase();return p.title.toLowerCase().includes(l)||p.domain.toLowerCase().includes(l)||p.meta.toLowerCase().includes(l)||p.keys.some(k=>l.includes(k));});
+      addMsg(`<div class="msg-ai">
+        <div class="msg-ai-label"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#378ADD" stroke-width="1"/><path d="M3.5 6l1.5 1.5 3-3" stroke="#378ADD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>AI synthesis</div>
+        <div class="msg-ai-synthesis">${hits.length>0?`Found <strong>${hits.length} pilot${hits.length!==1?'s':''}</strong> matching your search.`:'No pilots matched. Try searching by domain, state, or deployment stage.'}</div>
+        ${hits.length>0?cards(hits.map(p=>p.title)):''}
+        <div class="followups">
+          <div class="followup-chip" onclick="sendQ('Benefits delivery pilots')">Benefits delivery</div>
+          <div class="followup-chip" onclick="sendQ('What AI pilots are currently scaling?')">What\'s scaling?</div>
+          <div class="followup-chip" onclick="sendQ('Show me pilots with strong governance')">Governance-focused</div>
+        </div>
+      </div>`);
+    }
+  }, 360);
+}
+
+function sendQ(q) {
+  enterConversation();
+  if (n > 0) addMsg('<div class="thread-sep"></div>');
+  addMsg(`<div class="msg-user"><div class="msg-user-bubble">${q}</div></div>`);
+  respond(q); n++;
+}
+
+function handleSend() {
+  const inp = document.getElementById('chat-input');
+  const q = inp.value.trim(); if (!q) return;
+  inp.value = ''; sendQ(q);
+}
+
+function handleConvSend() {
+  const inp = document.getElementById('conv-input');
+  const q = inp.value.trim(); if (!q) return;
+  inp.value = '';
+  if (n > 0) addMsg('<div class="thread-sep"></div>');
+  addMsg(`<div class="msg-user"><div class="msg-user-bubble">${q}</div></div>`);
+  respond(q); n++;
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key==='Enter') handleSend(); });
+document.getElementById('conv-input').addEventListener('keydown', e => { if (e.key==='Enter') handleConvSend(); });
+</script>
+</body>
+</html>

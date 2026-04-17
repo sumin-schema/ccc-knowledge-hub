@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCF — Compare Pilots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; }
+
+  .nav { border-bottom: 1px solid #2e2e2e; background: #1a1a1a; }
+  .nav-inner { padding: 0 80px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; }
+  .nav-ccf { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; margin-right: 6px; }
+  .nav-name { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; }
+  .nav-div { width: 1px; height: 16px; background: rgba(255,255,255,0.12); margin: 0 24px; }
+  .nav-sec { font-size: 13px; color: rgba(255,255,255,0.35); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; }
+  .nav-links a.active { color: #fff; font-weight: 600; }
+
+  .bc { border-bottom: 1px solid #e8e5e0; padding: 0 80px; height: 40px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #aaa; }
+  .bc-cur { color: #1a1a1a; font-weight: 600; }
+
+  .page-header { padding: 40px 80px 32px; border-bottom: 1px solid #e8e5e0; }
+  .page-title { font-family: 'Libre Baskerville', serif; font-size: 28px; font-weight: 400; color: #1a1a1a; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #999; }
+
+  .synthesis-band { background: #1a1a1a; padding: 28px 80px; border-bottom: 1px solid #e8e5e0; }
+  .synth-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .synth-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #378ADD; }
+  .synth-text { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.75; }
+  .synth-text strong { color: rgba(255,255,255,0.9); font-weight: 600; }
+  .synth-footer { margin-top: 10px; font-size: 11px; color: rgba(255,255,255,0.2); }
+
+  .legend { display: flex; gap: 20px; padding: 14px 80px; font-size: 11px; color: #aaa; border-bottom: 1px solid #f0ede8; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── TABLE ─────────────────────────────────────────────────
+     Pure table element — guaranteed column alignment
+  ── */
+  .compare-outer { padding: 0 80px 80px; }
+
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  /* Column widths */
+  col.c-label { width: 200px; }
+  col.c-pilot  { width: auto; } /* equal share of remaining space */
+  col.c-pilot2 { width: auto; }
+
+  /* Sticky header row */
+  thead tr th {
+    position: sticky;
+    top: 60px;
+    background: #fff;
+    z-index: 10;
+    vertical-align: bottom;
+    padding: 24px 28px 16px;
+    border-bottom: 2px solid #1a1a1a;
+    border-left: 1px solid #e8e5e0;
+  }
+
+  thead tr th:first-child {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .th-domain { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+  .th-title { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 4px; line-height: 1.25; }
+  .th-meta { font-size: 12px; color: #999; margin-bottom: 10px; }
+
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 9px; border-radius: 2px; }
+  .tp { background: #E6F1FB; color: #185FA5; }
+
+  /* Group header rows */
+  tr.group td {
+    background: #faf9f7;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #bbb;
+    padding: 11px 0;
+    border-top: 1px solid #e8e5e0;
+    border-bottom: 1px solid #e8e5e0;
+  }
+
+  /* Data rows */
+  tr.row td {
+    padding: 16px 28px;
+    font-size: 13px; color: #1a1a1a; line-height: 1.55;
+    border-bottom: 1px solid #f5f2ee;
+    border-left: 1px solid #e8e5e0;
+    vertical-align: top;
+  }
+
+  tr.row td:first-child {
+    font-size: 12px; font-weight: 600; color: #aaa;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  tr.row:hover td { background: #faf9f7; }
+
+  td.differs { background: #fffbf0; }
+  tr.row:hover td.differs { background: #fff7e6; }
+
+  .differs-badge { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #854F0B; background: #FAEEDA; border-radius: 2px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
+  .match-badge   { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #3B6D11; background: #EAF3DE; border-radius: 2px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
+
+  .metric-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .metric-track { width: 100px; height: 6px; background: #f0ede8; border-radius: 3px; flex-shrink: 0; }
+  .metric-fill { height: 100%; border-radius: 3px; background: #1a1a1a; }
+
+  .chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip { font-size: 10px; font-weight: 600; color: #555; background: #f0ede8; border-radius: 2px; padding: 2px 7px; }
+  .chip.shared { background: #EAF3DE; color: #3B6D11; }
+
+  /* Add pilot button — below table */
+  .add-pilot-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 0 0;
+    border-top: 1px solid #e8e5e0;
+    margin-top: 0;
+  }
+
+  .add-pilot-btn {
+    height: 40px; padding: 0 20px;
+    border: 1px solid #ddd; border-radius: 3px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: #555;
+    background: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: all 0.12s;
+  }
+
+  .add-pilot-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  .add-pilot-hint { font-size: 12px; color: #bbb; }
+
+  .footer { background: #faf9f7; border-top: 1px solid #e8e5e0; padding: 48px 80px; display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr; gap: 48px; }
+  .f-org { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 10px; }
+  .f-sub { font-size: 12px; color: #bbb; line-height: 1.6; }
+  .f-head { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin-bottom: 14px; }
+  .f-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .f-links li { font-size: 13px; color: #aaa; }
+</style>
+</head>
+<body><script>
+(function() {
+  var stored = sessionStorage.getItem('ccf_auth');
+  if (stored === 'ok') return;
+  var user = prompt('Username:');
+  var pass = prompt('Password:');
+  if (user === 'ccf' && pass === '2026') {
+    sessionStorage.setItem('ccf_auth', 'ok');
+  } else {
+    document.body.innerHTML = '<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>';
+  }
+})();
+</script>
+
+<nav class="nav"><div class="nav-inner">
+  <div class="nav-left">
+    <span class="nav-ccf">CCF</span>
+    <span class="nav-name">Center for Civic Futures</span>
+    <div class="nav-div"></div>
+    <span class="nav-sec">AI &amp; Emerging Tech for Government</span>
+  </div>
+  <div class="nav-links">
+    <a>AI Knowledge Hub</a>
+    <a class="active">Pilots</a>
+    <a>Resources</a>
+    <a>About</a>
+  </div>
+</div></nav>
+
+<div class="bc">
+  <span>AI Knowledge Hub</span><span style="color:#ddd">/</span>
+  <span>Pilots</span><span style="color:#ddd">/</span>
+  <span class="bc-cur">Compare pilots</span>
+</div>
+
+<div class="page-header">
+  <div class="page-title">Comparing 2 pilots</div>
+  <div class="page-sub">Benefits Eligibility Screening · Medicaid Redetermination AI</div>
+</div>
+
+<div class="synthesis-band">
+  <div class="synth-header">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#378ADD" stroke-width="1"/><path d="M3.5 6l1.5 1.5 3-3" stroke="#378ADD" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="synth-label">AI synthesis</span>
+  </div>
+  <p class="synth-text">Both pilots use AI for <strong>benefits eligibility decision support</strong> with human-in-the-loop review — but they differ in scope and trigger. <strong>Colorado</strong> focuses on SNAP and Medicaid application pre-screening, processing 2,000 applications per week with a 35% speed improvement. <strong>Oregon</strong> addresses Medicaid redeterminations following the end of continuous enrollment, managing a surge in caseload without additional staff. Both require caseworker sign-off before any final determination. Oregon has invested more heavily in external equity auditing; Colorado's oversight model is internally led.</p>
+  <div class="synth-footer">Based on 2 pilot records · Verify details in individual pilot entries</div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#FAEEDA;border:1px solid #f0b44a;"></div>Differs between pilots</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#EAF3DE;border:1px solid #8fcc4a;"></div>Matches across pilots</div>
+</div>
+
+<div class="compare-outer">
+  <table class="compare">
+    <colgroup>
+      <col class="c-label">
+      <col class="c-pilot">
+      <col class="c-pilot2">
+    </colgroup>
+    <thead>
+      <tr>
+        <th style="background:#fff;"></th>
+        <th>
+          <div class="th-domain">Benefits Delivery</div>
+          <div class="th-title">Benefits Eligibility Screening</div>
+          <div class="th-meta">Colorado · Dept. of Human Services</div>
+          <span class="tag tp">Piloting</span>
+        </th>
+        <th>
+          <div class="th-domain">Benefits Delivery</div>
+          <div class="th-title">Medicaid Redetermination AI</div>
+          <div class="th-meta">Oregon · Oregon Health Authority</div>
+          <span class="tag tp">Piloting</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- OVERVIEW -->
+      <tr class="group"><td>Overview</td><td></td><td></td></tr>
+
+      <tr class="row">
+        <td>What it does</td>
+        <td>AI-assisted pre-screening for SNAP and Medicaid applications — document review, eligibility cross-referencing, and case flagging.</td>
+        <td class="differs">AI-assisted review of Medicaid eligibility redeterminations following the end of continuous enrollment coverage. <span class="differs-badge">Differs</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Who it serves</td>
+        <td>Caseworkers processing new benefit applications</td>
+        <td class="differs">Caseworkers managing redetermination backlog <span class="differs-badge">Differs</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Problem it solves</td>
+        <td>Too much caseworker time spent on routine document review for new applications</td>
+        <td class="differs">Volume surge in redeterminations with no additional staff capacity <span class="differs-badge">Differs</span></td>
+      </tr>
+
+      <!-- TECHNICAL -->
+      <tr class="group"><td>Technical</td><td></td><td></td></tr>
+
+      <tr class="row">
+        <td>AI application type</td>
+        <td><div class="chips"><span class="chip shared">Document summarization</span><span class="chip shared">Decision support</span></div></td>
+        <td><div class="chips"><span class="chip shared">Document summarization</span><span class="chip shared">Decision support</span><span class="chip">Data classification</span></div></td>
+      </tr>
+
+      <tr class="row">
+        <td>How it was built</td>
+        <td class="differs">Vendor-built with in-house customization <span class="differs-badge">Differs</span></td>
+        <td>In-house, built on open-source LLM</td>
+      </tr>
+
+      <tr class="row">
+        <td>Deployment stage</td>
+        <td>Piloting — 3 counties <span class="match-badge">Matches</span></td>
+        <td>Piloting — statewide <span class="match-badge">Matches</span></td>
+      </tr>
+
+      <!-- OUTCOMES -->
+      <tr class="group"><td>Outcomes</td><td></td><td></td></tr>
+
+      <tr class="row">
+        <td>Processing time</td>
+        <td>35% reduction<div class="metric-bar"><div class="metric-track"><div class="metric-fill" style="width:88%"></div></div><span style="font-size:11px;color:#888">35%</span></div></td>
+        <td class="differs">22% reduction<div class="metric-bar"><div class="metric-track"><div class="metric-fill" style="width:55%"></div></div><span style="font-size:11px;color:#888">22%</span></div><span class="differs-badge">Differs</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Scale</td>
+        <td class="differs">2,000 applications / week in pilot counties <span class="differs-badge">Differs</span></td>
+        <td>180,000 redeterminations in 90 days</td>
+      </tr>
+
+      <tr class="row">
+        <td>False negatives</td>
+        <td>0 on pilot sample <span class="match-badge">Matches</span></td>
+        <td>0 on pilot sample <span class="match-badge">Matches</span></td>
+      </tr>
+
+      <!-- GOVERNANCE -->
+      <tr class="group"><td>Governance</td><td></td><td></td></tr>
+
+      <tr class="row">
+        <td>Human in the loop</td>
+        <td>All AI-flagged determinations validated by caseworker before final decision <span class="match-badge">Matches</span></td>
+        <td>All AI-flagged determinations validated by caseworker before final decision <span class="match-badge">Matches</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Oversight model</td>
+        <td>Internal oversight committee — agency leadership, IT, legal, community advocates</td>
+        <td class="differs">Internal committee + external equity audit by state equity office <span class="differs-badge">Differs</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Audit trail</td>
+        <td>All model decisions logged and auditable <span class="match-badge">Matches</span></td>
+        <td>All model decisions logged and auditable <span class="match-badge">Matches</span></td>
+      </tr>
+
+      <tr class="row">
+        <td>Disparity monitoring</td>
+        <td class="differs">Not documented <span class="differs-badge">Differs</span></td>
+        <td>Ongoing disparity monitoring by race and language</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- ADD PILOT — below table, not wasting column space -->
+  <div class="add-pilot-bar">
+    <button class="add-pilot-btn">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Compare another pilot
+    </button>
+    <span class="add-pilot-hint">Add a third pilot to the comparison</span>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div><div class="f-org">Center for Civic Futures</div><div class="f-sub">A non-partisan, non-profit project of Digital Harbor Foundation</div></div>
+  <div><div class="f-head">Programs</div><ul class="f-links"><li>AI Readiness Project</li><li>AI Knowledge Hub</li><li>Chief AI Officer Network</li></ul></div>
+  <div><div class="f-head">Resources</div><ul class="f-links"><li>Research &amp; Publications</li><li>Events</li><li>News</li></ul></div>
+  <div><div class="f-head">Connect</div><ul class="f-links"><li>Contact us</li><li>LinkedIn</li><li>Newsletter</li></ul></div>
+</div>
+
+</body>
+</html>
