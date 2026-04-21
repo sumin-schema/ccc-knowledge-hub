@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCF — Pilot Landscape Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+  .nav { border-bottom: 1px solid #2e2e2e; background: #1a1a1a; flex-shrink: 0; }
+  .nav-inner { padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; }
+  .nav-ccf { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; margin-right: 6px; }
+  .nav-name { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; }
+  .nav-div { width: 1px; height: 14px; background: rgba(255,255,255,0.12); margin: 0 20px; }
+  .nav-sec { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; cursor: pointer; }
+  .nav-links a.active { color: #fff; font-weight: 600; }
+  .nav-table-link { font-size: 11px; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 2px; padding: 4px 12px; cursor: pointer; transition: all 0.12s; text-decoration: none; }
+  .nav-table-link:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  /* TOOLBAR */
+  .toolbar {
+    padding: 12px 40px;
+    border-bottom: 1px solid #e8e5e0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; background: #fff;
+    z-index: 10;
+  }
+
+  .toolbar-left { display: flex; align-items: center; gap: 24px; }
+  .toolbar-title { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; }
+  .toolbar-count { font-size: 12px; color: #aaa; }
+
+  .toggle-group { display: flex; gap: 0; border: 1px solid #e8e5e0; border-radius: 3px; overflow: hidden; }
+  .toggle-btn {
+    font-size: 12px; font-weight: 500; color: #888;
+    padding: 7px 16px; cursor: pointer; background: #fff;
+    border-right: 1px solid #e8e5e0; transition: all 0.12s;
+    font-family: 'DM Sans', sans-serif; border: none;
+    border-right: 1px solid #e8e5e0;
+  }
+  .toggle-btn:last-child { border-right: none; }
+  .toggle-btn.active { background: #1a1a1a; color: #fff; }
+  .toggle-btn:hover:not(.active) { background: #faf9f7; color: #1a1a1a; }
+
+  /* GRAPH CANVAS */
+  .graph-wrap { flex: 1; position: relative; overflow: hidden; background: #fdfdfc; }
+  canvas#graph { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+  canvas#graph.dragging { cursor: grabbing; }
+
+  /* PILOT PREVIEW CARD */
+  .preview-card {
+    position: absolute; z-index: 20;
+    background: #fff; border: 1px solid #e8e5e0;
+    border-radius: 4px; padding: 20px 22px 18px;
+    width: 280px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    pointer-events: none;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .preview-card.visible { opacity: 1; pointer-events: all; }
+  .pc-domain { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #ccc; margin-bottom: 8px; }
+  .pc-title { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 400; color: #1a1a1a; margin-bottom: 6px; line-height: 1.3; }
+  .pc-meta { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+  .pc-excerpt { font-size: 12px; color: #888; line-height: 1.55; margin-bottom: 14px; }
+  .pc-tags { display: flex; gap: 6px; margin-bottom: 14px; }
+  .pc-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .tp { background: #E6F1FB; color: #185FA5; }
+  .tpl { background: #EAF3DE; color: #3B6D11; }
+  .ts { background: #FAEEDA; color: #854F0B; }
+  .pc-link { font-size: 12px; font-weight: 600; color: #378ADD; cursor: pointer; text-decoration: none; display: block; }
+  .pc-close { position: absolute; top: 12px; right: 14px; font-size: 16px; color: #ccc; cursor: pointer; line-height: 1; pointer-events: all; }
+
+
+
+  /* ZOOM CONTROLS */
+  .zoom-controls {
+    position: absolute; bottom: 24px; right: 40px;
+    display: flex; align-items: center; gap: 0;
+    z-index: 10; border: 1px solid #e8e5e0; border-radius: 3px; overflow: hidden;
+    background: #fff;
+  }
+  .zoom-btn {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #555; cursor: pointer; background: #fff;
+    border: none; font-family: 'DM Sans', sans-serif; transition: background 0.1s;
+    border-right: 1px solid #e8e5e0;
+  }
+  .zoom-btn:last-child { border-right: none; }
+  .zoom-btn:hover { background: #faf9f7; color: #1a1a1a; }
+  .zoom-level { font-size: 11px; color: #aaa; padding: 0 10px; display: flex; align-items: center; border-right: 1px solid #e8e5e0; min-width: 44px; justify-content: center; }
+
+  /* HINT */
+  .hint { position: absolute; bottom: 68px; right: 40px; font-size: 11px; color: #bbb; z-index: 10; }
+</style>
+</head>
+<body>
+
+<script>
+(function() {
+  var s = sessionStorage.getItem('ccf_auth');
+  if (s === 'ok') return;
+  var u = prompt('Username:'), p = prompt('Password:');
+  if (u === 'ccf' && p === '2026') { sessionStorage.setItem('ccf_auth','ok'); }
+  else { document.body.innerHTML='<div style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#999;font-size:14px;">Access denied.</div>'; }
+})();
+</script>
+
+<nav class="nav"><div class="nav-inner">
+  <div class="nav-left">
+    <span class="nav-ccf">CCF</span>
+    <span class="nav-name">Center for Civic Futures</span>
+    <div class="nav-div"></div>
+    <span class="nav-sec">AI &amp; Emerging Tech for Government</span>
+  </div>
+  <div class="nav-links">
+    <a>AI Knowledge Hub</a>
+    <a class="active">Pilots</a>
+    <a>Resources</a>
+    <a>About</a>
+    <a class="nav-table-link" href="ccf-landscape-hybrid.html">Table view ↗</a>
+  </div>
+</div></nav>
+
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div class="toolbar-title">Pilot Landscape</div>
+    <div class="toolbar-count" id="count-label">47 pilots · grouped by domain</div>
+  </div>
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="setGroup('domain')">Domain</button>
+    <button class="toggle-btn" onclick="setGroup('state')">State</button>
+    <button class="toggle-btn" onclick="setGroup('status')">Status</button>
+    <button class="toggle-btn" onclick="setGroup('usecase')">Use Case</button>
+  </div>
+</div>
+
+<div class="graph-wrap">
+  <canvas id="graph"></canvas>
+
+  <div class="preview-card" id="preview">
+    <span class="pc-close" onclick="closePreview()">×</span>
+    <div class="pc-domain" id="prev-domain"></div>
+    <div class="pc-title" id="prev-title"></div>
+    <div class="pc-meta" id="prev-meta"></div>
+    <div class="pc-excerpt" id="prev-excerpt"></div>
+    <div class="pc-tags" id="prev-tags"></div>
+    <a class="pc-link" href="ccf-detail-parallax.html">View full pilot →</a>
+  </div>
+
+  <div class="zoom-controls">
+    <button class="zoom-btn" onclick="zoomIn()">+</button>
+    <span class="zoom-level" id="zoom-level">100%</span>
+    <button class="zoom-btn" onclick="zoomOut()">−</button>
+    <button class="zoom-btn" onclick="zoomReset()" style="font-size:11px;font-weight:600;color:#888;width:44px;">Reset</button>
+  </div>
+  <div class="hint">Drag to explore · Click a pilot to preview</div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+const PILOTS = [
+  { id:1,  title:"Benefits Eligibility Screening",   state:"Colorado",    domain:"Benefits Delivery",  status:"Piloting",  usecase:"Decision Support",    agency:"Dept. of Human Services",       excerpt:"AI-assisted pre-screening for SNAP and Medicaid. 35% reduction in processing time.",    tag:"tp"  },
+  { id:2,  title:"Medicaid Redetermination AI",      state:"Oregon",      domain:"Benefits Delivery",  status:"Piloting",  usecase:"Decision Support",    agency:"Oregon Health Authority",        excerpt:"AI-assisted review of Medicaid eligibility redeterminations.",                           tag:"tp"  },
+  { id:3,  title:"SNAP Processing Automation",       state:"Texas",       domain:"Benefits Delivery",  status:"Planning",  usecase:"Document Processing", agency:"Health & Human Services",        excerpt:"Automated document verification for SNAP applications statewide.",                        tag:"tpl" },
+  { id:4,  title:"Child Care Subsidy Eligibility",   state:"Georgia",     domain:"Benefits Delivery",  status:"Planning",  usecase:"Decision Support",    agency:"Dept. of Early Care & Learning", excerpt:"AI-assisted eligibility screening for child care subsidy programs.",                      tag:"tpl" },
+  { id:5,  title:"Workforce Development Chatbot",    state:"Indiana",     domain:"Workforce",          status:"Scaling",   usecase:"Citizen Services",    agency:"Dept. of Workforce Development", excerpt:"Conversational AI for job seekers. 74% self-service resolution.",                        tag:"ts"  },
+  { id:6,  title:"Job Matching AI",                  state:"Michigan",    domain:"Workforce",          status:"Piloting",  usecase:"Decision Support",    agency:"Dept. of Labor",                 excerpt:"ML-based job matching for unemployment claimants.",                                      tag:"tp"  },
+  { id:7,  title:"Unemployment Fraud Detection",     state:"Texas",       domain:"Fraud Detection",    status:"Scaling",   usecase:"Fraud Prevention",    agency:"Texas Workforce Commission",     excerpt:"Pattern recognition for fraudulent claims. $340M prevented in FY2025.",                  tag:"ts"  },
+  { id:8,  title:"Benefits Fraud Analytics",         state:"Florida",     domain:"Fraud Detection",    status:"Piloting",  usecase:"Fraud Prevention",    agency:"Dept. of Children & Families",   excerpt:"AI-driven analytics to identify potentially fraudulent benefit claims.",                  tag:"tp"  },
+  { id:9,  title:"Permit Review Automation",         state:"Utah",        domain:"Permitting",         status:"Piloting",  usecase:"Document Processing", agency:"Dept. of Commerce",              excerpt:"ML-based review of commercial building permit applications.",                             tag:"tp"  },
+  { id:10, title:"Environmental Permit AI",          state:"Washington",  domain:"Permitting",         status:"Planning",  usecase:"Document Processing", agency:"Dept. of Ecology",               excerpt:"AI-assisted review of environmental impact and permitting documents.",                    tag:"tpl" },
+  { id:11, title:"License Renewal Processing",       state:"Michigan",    domain:"Licensing",          status:"Planning",  usecase:"Document Processing", agency:"Dept. of Licensing & Regulatory",excerpt:"Automated document verification for professional license renewals.",                     tag:"tpl" },
+  { id:12, title:"Professional License Chatbot",     state:"Arizona",     domain:"Licensing",          status:"Piloting",  usecase:"Citizen Services",    agency:"Dept. of Professional Regulation",excerpt:"Conversational AI for license application guidance.",                                   tag:"tp"  },
+  { id:13, title:"IT Help Desk Agent",               state:"California",  domain:"Internal Ops",       status:"Piloting",  usecase:"Internal Automation", agency:"Dept. of Technology",            excerpt:"AI agent handling tier-1 IT support. 68% resolved without human involvement.",           tag:"tp"  },
+  { id:14, title:"HR Document Summarization",        state:"New York",    domain:"Internal Ops",       status:"Piloting",  usecase:"Document Processing", agency:"Office of General Services",     excerpt:"LLM-assisted summarization of HR policy documents and employee handbooks.",              tag:"tp"  },
+  { id:15, title:"Contract Review AI",               state:"Virginia",    domain:"Internal Ops",       status:"Planning",  usecase:"Document Processing", agency:"Dept. of General Services",      excerpt:"AI-assisted review and risk flagging for state vendor contracts.",                        tag:"tpl" },
+  { id:16, title:"Legacy Code Modernization",        state:"New Jersey",  domain:"Legacy Systems",     status:"Piloting",  usecase:"Code Modernization",  agency:"Office of Information Technology",excerpt:"LLM-assisted COBOL to modern language translation.",                                    tag:"tp"  },
+  { id:17, title:"Mainframe Migration Assistant",    state:"Ohio",        domain:"Legacy Systems",     status:"Planning",  usecase:"Code Modernization",  agency:"Dept. of Administrative Services",excerpt:"AI-assisted analysis and migration planning for legacy mainframe systems.",             tag:"tpl" },
+];
+
+// ── COLOR MAP ─────────────────────────────────────────────
+const DOMAIN_COLORS = {
+  "Benefits Delivery": "#378ADD",
+  "Workforce":         "#8fcc4a",
+  "Fraud Detection":   "#f0b44a",
+  "Permitting":        "#d47eb5",
+  "Licensing":         "#7ec8c8",
+  "Internal Ops":      "#a08ad4",
+  "Legacy Systems":    "#e08060",
+};
+
+const STATUS_COLORS = {
+  "Piloting": "#378ADD",
+  "Planning": "#8fcc4a",
+  "Scaling":  "#f0b44a",
+};
+
+const USECASE_COLORS = {
+  "Decision Support":    "#378ADD",
+  "Document Processing": "#8fcc4a",
+  "Citizen Services":    "#d47eb5",
+  "Fraud Prevention":    "#f0b44a",
+  "Internal Automation": "#a08ad4",
+  "Code Modernization":  "#e08060",
+};
+
+// ── GRAPH STATE ───────────────────────────────────────────
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+let W, H, groupBy = 'domain';
+let nodes = [], parentNodes = [], dragging = null, dragOffset = { x:0, y:0 };
+let panX = 0, panY = 0, isPanning = false, panStart = { x:0, y:0 };
+let hoveredNode = null, animFrame = 0;
+let scale = 1;
+
+function getGroupKey(pilot) {
+  if (groupBy === 'domain')   return pilot.domain;
+  if (groupBy === 'state')    return pilot.state;
+  if (groupBy === 'status')   return pilot.status;
+  if (groupBy === 'usecase')  return pilot.usecase;
+}
+
+function getColor(key) {
+  if (groupBy === 'domain')   return DOMAIN_COLORS[key]  || '#888';
+  if (groupBy === 'state')    return '#378ADD';
+  if (groupBy === 'status')   return STATUS_COLORS[key]  || '#888';
+  if (groupBy === 'usecase')  return USECASE_COLORS[key] || '#888';
+}
+
+function buildGraph() {
+  // Group pilots
+  const groups = {};
+  PILOTS.forEach(p => {
+    const key = getGroupKey(p);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  });
+
+  const keys = Object.keys(groups);
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) * 0.28;
+
+  parentNodes = keys.map((key, i) => {
+    const angle = (i / keys.length) * Math.PI * 2 - Math.PI / 2;
+    return {
+      id: 'parent_' + key,
+      label: key,
+      x: cx + Math.cos(angle) * radius,
+      y: cy + Math.sin(angle) * radius,
+      vx: 0, vy: 0,
+      color: getColor(key),
+      isParent: true,
+      count: groups[key].length,
+    };
+  });
+
+  // Child nodes — pilot nodes orbiting parents
+  nodes = [];
+  parentNodes.forEach(parent => {
+    const key = parent.label;
+    const children = groups[key];
+    const orbitR = 70 + children.length * 8;
+    children.forEach((pilot, i) => {
+      const angle = (i / children.length) * Math.PI * 2 + Math.random() * 0.5;
+      nodes.push({
+        id: pilot.id,
+        pilot,
+        parentId: 'parent_' + key,
+        x: parent.x + Math.cos(angle) * orbitR * 0.85,
+        y: parent.y + Math.sin(angle) * orbitR * 0.85,
+        vx: 0, vy: 0,
+        color: getColor(key),
+        isParent: false,
+      });
+    });
+  });
+
+  simEnergy = 1.0;
+  simStopped = false;
+  updateCountLabel();
+}
+
+function updateCountLabel() {
+  const labels = { domain: 'domain', state: 'state', status: 'status', usecase: 'use case' };
+  document.getElementById('count-label').textContent = `A growing database of state AI pilots · grouped by ${labels[groupBy]}`;
+}
+
+// ── FORCE SIMULATION ──────────────────────────────────────
+let simEnergy = 1.0; // cools to zero, stops simulation
+let simStopped = false;
+
+function simulate() {
+  if (simStopped && !dragging) return;
+
+  const allNodes = [...parentNodes, ...nodes];
+  let totalMovement = 0;
+
+  // Parent-to-parent repulsion
+  for (let i = 0; i < parentNodes.length; i++) {
+    for (let j = i + 1; j < parentNodes.length; j++) {
+      const a = parentNodes[i], b = parentNodes[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const d = Math.sqrt(dx*dx + dy*dy) || 1;
+      const force = (5000 / (d * d)) * simEnergy;
+      a.vx -= (dx/d) * force; a.vy -= (dy/d) * force;
+      b.vx += (dx/d) * force; b.vy += (dy/d) * force;
+    }
+  }
+
+  // Child nodes attracted to parent
+  nodes.forEach(n => {
+    const parent = parentNodes.find(p => p.id === n.parentId);
+    if (!parent) return;
+    const dx = parent.x - n.x, dy = parent.y - n.y;
+    const d = Math.sqrt(dx*dx + dy*dy) || 1;
+    const target = 65;
+    const force = (d - target) * 0.004 * simEnergy;
+    n.vx += (dx/d) * force; n.vy += (dy/d) * force;
+  });
+
+  // Child-child repulsion — only when genuinely overlapping
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      if (nodes[i].parentId !== nodes[j].parentId) continue;
+      const dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
+      const d = Math.sqrt(dx*dx + dy*dy) || 1;
+      if (d < 28) { // only push if actually overlapping node radius
+        const force = (120 / (d * d)) * simEnergy;
+        nodes[i].vx -= (dx/d) * force; nodes[i].vy -= (dy/d) * force;
+        nodes[j].vx += (dx/d) * force; nodes[j].vy += (dy/d) * force;
+      }
+    }
+  }
+
+  // Very gentle center gravity
+  allNodes.forEach(n => {
+    n.vx += (W/2 - n.x) * 0.0002 * simEnergy;
+    n.vy += (H/2 - n.y) * 0.0002 * simEnergy;
+  });
+
+  // Integrate with strong damping
+  allNodes.forEach(n => {
+    if (n === dragging) return;
+    n.vx *= 0.4; n.vy *= 0.4;
+    // Dead zone — stop micro-movements entirely
+    if (Math.abs(n.vx) < 0.01) n.vx = 0;
+    if (Math.abs(n.vy) < 0.01) n.vy = 0;
+    n.x += n.vx; n.y += n.vy;
+    totalMovement += Math.abs(n.vx) + Math.abs(n.vy);
+  });
+
+  // Cool down over time
+  simEnergy *= 0.985;
+
+  // Stop simulation once settled
+  if (totalMovement < 0.5 && simEnergy < 0.05) {
+    simStopped = true;
+  }
+}
+
+// ── DRAW ──────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(panX + W/2, panY + H/2);
+  ctx.scale(scale, scale);
+  ctx.translate(-W/2, -H/2);
+
+  // Draw edges — parent to children
+  nodes.forEach(n => {
+    const parent = parentNodes.find(p => p.id === n.parentId);
+    if (!parent) return;
+    ctx.beginPath();
+    ctx.moveTo(parent.x, parent.y);
+    ctx.lineTo(n.x, n.y);
+    ctx.strokeStyle = n.color + '28';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Draw parent nodes
+  parentNodes.forEach(p => {
+    const r = 28 + p.count * 3;
+    const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2);
+    grd.addColorStop(0, p.color + '18');
+    grd.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(p.x, p.y, r * 2, 0, Math.PI * 2);
+    ctx.fillStyle = grd; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + '22';
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 1.5;
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(p.label, p.x, p.y - 4);
+    ctx.font = '400 10px DM Sans, sans-serif';
+    ctx.fillStyle = '#aaa';
+    ctx.fillText(p.count + ' pilot' + (p.count !== 1 ? 's' : ''), p.x, p.y + 8);
+  });
+
+  // Draw child nodes
+  nodes.forEach(n => {
+    const isHovered = n === hoveredNode;
+    const r = isHovered ? 9 : 7;
+    ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = isHovered ? n.color : n.color + 'cc';
+    ctx.strokeStyle = isHovered ? '#fff' : n.color;
+    ctx.lineWidth = isHovered ? 2 : 1;
+    ctx.fill(); ctx.stroke();
+
+    if (isHovered) {
+      ctx.font = '500 11px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      const label = n.pilot.title;
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.fillRect(n.x - tw/2 - 6, n.y - r - 22, tw + 12, 18);
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillText(label, n.x, n.y - r - 6);
+    }
+  });
+
+  ctx.restore();
+  animate_frame = requestAnimationFrame(tick);
+}
+
+function tick() {
+  simulate();
+  draw();
+}
+
+// ── INTERACTION ───────────────────────────────────────────
+function getMousePos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left - panX, y: e.clientY - rect.top - panY };
+}
+
+function findNodeAt(mx, my) {
+  // Check child nodes first
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const n = nodes[i];
+    const d = Math.sqrt((n.x-mx)**2 + (n.y-my)**2);
+    if (d < 12) return n;
+  }
+  // Then parent nodes
+  for (let i = parentNodes.length - 1; i >= 0; i--) {
+    const p = parentNodes[i];
+    const r = 28 + p.count * 3;
+    const d = Math.sqrt((p.x-mx)**2 + (p.y-my)**2);
+    if (d < r) return p;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousemove', e => {
+  const { x, y } = getMousePos(e);
+  if (dragging) {
+    dragging.x = x + dragOffset.x;
+    dragging.y = y + dragOffset.y;
+    dragging.vx = 0; dragging.vy = 0;
+    return;
+  }
+  if (isPanning) {
+    panX = e.clientX - panStart.x;
+    panY = e.clientY - panStart.y;
+    return;
+  }
+  const n = findNodeAt(x, y);
+  hoveredNode = (n && !n.isParent) ? n : null;
+  canvas.style.cursor = n ? 'pointer' : 'grab';
+});
+
+canvas.addEventListener('mousedown', e => {
+  const { x, y } = getMousePos(e);
+  const n = findNodeAt(x, y);
+  if (n) {
+    dragging = n;
+    dragOffset = { x: n.x - x, y: n.y - y };
+    canvas.classList.add('dragging');
+  } else {
+    isPanning = true;
+    panStart = { x: e.clientX - panX, y: e.clientY - panY };
+  }
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (dragging) {
+    const { x, y } = getMousePos(e);
+    const dist = Math.sqrt((dragging.x - (x + dragOffset.x))**2 + (dragging.y - (y + dragOffset.y))**2);
+    if (dist < 4 && !dragging.isParent) showPreview(dragging, e);
+    dragging = null;
+    canvas.classList.remove('dragging');
+    simStopped = false;
+    simEnergy = 0.3;
+  }
+  isPanning = false;
+});
+
+canvas.addEventListener('click', e => {
+  if (dragging) return;
+  const { x, y } = getMousePos(e);
+  const n = findNodeAt(x, y);
+  if (n && !n.isParent) showPreview(n, e);
+});
+
+function showPreview(node, e) {
+  const p = node.pilot;
+  document.getElementById('prev-domain').textContent = p.domain;
+  document.getElementById('prev-title').textContent = p.title;
+  document.getElementById('prev-meta').textContent = p.state + ' · ' + p.agency;
+  document.getElementById('prev-excerpt').textContent = p.excerpt;
+  document.getElementById('prev-tags').innerHTML = `<span class="pc-tag ${p.tag}">${p.status}</span><span class="pc-tag" style="background:#f5f2ee;color:#888;">${p.usecase}</span>`;
+
+  const card = document.getElementById('preview');
+  const rect = canvas.getBoundingClientRect();
+  let left = e.clientX - rect.left + 16;
+  let top = e.clientY - rect.top - 20;
+  if (left + 290 > rect.width) left = e.clientX - rect.left - 300;
+  if (top + 240 > rect.height) top = rect.height - 260;
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+  card.classList.add('visible');
+}
+
+function closePreview() {
+  document.getElementById('preview').classList.remove('visible');
+}
+
+// ── TOGGLE ────────────────────────────────────────────────
+function setGroup(g) {
+  groupBy = g;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  buildGraph();
+}
+
+// ── ZOOM ──────────────────────────────────────────────
+function zoomIn() {
+  scale = Math.min(scale + 0.15, 3);
+  updateZoomLabel();
+}
+
+function zoomOut() {
+  scale = Math.max(scale - 0.15, 0.3);
+  updateZoomLabel();
+}
+
+function zoomReset() {
+  scale = 1; panX = 0; panY = 0;
+  updateZoomLabel();
+}
+
+function updateZoomLabel() {
+  document.getElementById('zoom-level').textContent = Math.round(scale * 100) + '%';
+}
+
+// Mouse wheel zoom
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? -0.08 : 0.08;
+  scale = Math.max(0.3, Math.min(3, scale + delta));
+  updateZoomLabel();
+}, { passive: false });
+
+// ── RESIZE ────────────────────────────────────────────────
+function resize() {
+  const wrap = document.querySelector('.graph-wrap');
+  W = wrap.offsetWidth; H = wrap.offsetHeight;
+  canvas.width = W; canvas.height = H;
+  buildGraph();
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => { resize(); tick(); });
+</script>
+</body>
+</html>
